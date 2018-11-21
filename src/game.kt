@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import javax.swing.*
 
-val frame = JFrame()
+
 val myChip8 : Chip8 = Chip8Impl(false)
 
 fun main(args: Array<String>) {
@@ -18,7 +18,6 @@ fun main(args: Array<String>) {
     myChip8.loadGame("rom/pong2.c8")
 
     while (true) {
-//    for (i in 0 until 50) {
         myChip8.emulateCycle()
 
         if (myChip8.drawFlag) {
@@ -26,13 +25,13 @@ fun main(args: Array<String>) {
             myChip8.drawFlag = false
         }
 
-        myChip8.setKeys()
         Thread.sleep(1)
     }
 }
 
 fun initializeGraphics(gamePanel: GamePanel) {
 
+    val frame = JFrame()
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     frame.isResizable = false
 

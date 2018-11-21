@@ -10,6 +10,4 @@ interface Chip8 {
     fun emulateCycle(): Unit
 
     fun printPixelScreen(): Unit
-
-    fun setKeys(): Unit
 }

@@ -58,17 +58,12 @@ class Chip8Impl (override var drawFlag: Boolean) : Chip8 {
         for (i in 0 until buffer.size) {
             memory[i + 0x200] = buffer[i]
         }
-
-//        for (i in 0 until buffer.size step 2) {
-//            print(String.format("%02X%02X ", buffer[i], buffer[i+1]))
-//            if (i % 16 == 0) println()
-//        }
     }
 
     override fun emulateCycle() {
         // fetch Opcode
-        val top = memory[pc].toInt() and 0xFF shl 8
-        val bottom = memory[pc + 1].toInt() and 0xFF
+        val top = memory[pc].toPositiveInt() shl 8
+        val bottom = memory[pc + 1].toPositiveInt()
         opCode = top or bottom
         println("Executing: 0x${String.format("%04X ", opCode)}")
 
@@ -90,7 +85,7 @@ class Chip8Impl (override var drawFlag: Boolean) : Chip8 {
                     }
                     // return from subroutine
                     0x000E -> {
-                        --sp
+                        --sp // pop off the stack
                         pc = stack[sp]
                         pc += 2
                     }
@@ -103,10 +98,10 @@ class Chip8Impl (override var drawFlag: Boolean) : Chip8 {
             0x1000 -> {
                 pc = opCode and 0x0FFF
             }
-            0x2000 -> {
-                stack[sp] = pc
-                ++sp
-                pc = opCode and 0x0FFF
+            0x2000 -> { // calling subroutine
+                stack[sp] = pc // stores the current program counter to the stack
+                ++sp // increment the stack pointer so we don't overwrite
+                pc = opCode and 0x0FFF // jump to address based on the last 3 number of the current opCode
             }
             0x3000 -> {
                 pc += if (vRegister[parameterX] == (opCode and 0x00FF).toByte()) {
@@ -245,14 +240,14 @@ class Chip8Impl (override var drawFlag: Boolean) : Chip8 {
             }
             0xE000 -> {
                 when (opCode and 0x00FF) {
-                    0x009E -> {
+                    0x009E -> { // skip next instructions if key is pressed
                         if (key[vRegister[parameterX].toPositiveInt()].toPositiveInt() != 0) {
                             pc += 4
                         } else {
                             pc += 2
                         }
                     }
-                    0x00A1 -> {
+                    0x00A1 -> { // skip next instruction if key isn't pressed
                         if (key[vRegister[parameterX].toPositiveInt()].toPositiveInt() == 0) {
                             pc += 4
                         } else {
@@ -353,14 +348,6 @@ class Chip8Impl (override var drawFlag: Boolean) : Chip8 {
             }
             println()
         }
-    }
-
-    override fun setKeys() {
-
-
-
-
-
     }
 
 }
